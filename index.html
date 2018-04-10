@@ -1,27 +1,57 @@
+<!-- Creates two global variables, users and streams.
+users is an array of strings - all the usernames that you're following.
+streams is an object with two properties, users and home.
+streams.home is an array of all tweets from all the users you're following.
+streams.users is an object with properties for each user. streams.users.shawndrost has all of shawndrost's tweets.
+Kicks off a periodic process that puts more data in streams.
+-->
+
 <!DOCTYPE html>
 <html>
-  <head>
-    <script src="jquery.js"></script>
-    <script src="data_generator.js"></script>
-  </head>
-  <body>
-    <script>
 
-      $(document).ready(function(){
-        var $body = $('body');
-        $body.html('');
+<head>
+  <script src="jquery.js"></script>
+  <script src="data_generator.js"></script>
+</head>
 
-        var index = streams.home.length - 1;
-        while(index >= 0){
-          var tweet = streams.home[index];
-          var $tweet = $('<div></div>');
-          $tweet.text('@' + tweet.user + ': ' + tweet.message);
-          $tweet.appendTo($body);
-          index -= 1;
-        }
+<body>
+  <script>
 
-      });
+    $(document).ready(function () {
+      var $body = $('body');
+      $body.html('');
 
-    </script>
-  </body>
+      var index = streams.home.length - 1;
+      while (index >= 0) {
+        var tweet = streams.home[index];
+        var $tweet = $('<div></div>');
+        $tweet.text('@' + tweet.user + ': ' + tweet.message + ' posted at: ' + tweet.created_at);
+        $tweet.appendTo($body);
+        $tweet.on('click', function () {
+          $('div').remove();
+          $('button').remove();          
+          var selectedUser = $(this).text().split(':')[0].slice(1);
+          var userTweets = streams.users[selectedUser]
+          for (var tweet of userTweets) {
+            var $tweet = $('<div></div>');
+            $tweet.text('@' + tweet.user + ': ' + tweet.message + ' posted at: ' + tweet.created_at);
+            $tweet.appendTo($body);
+          }
+          $body.append('<button type="button">Go Back</button>')
+          $('button').on('click', function () {
+            location.reload();
+          })
+        })
+        index -= 1;
+      }
+      $body.append('<button type="button">Get New Tweets</button>')
+      $('button').on('click', function () {
+        location.reload();
+      })
+    });
+
+  </script>
+
+</body>
+
 </html>
